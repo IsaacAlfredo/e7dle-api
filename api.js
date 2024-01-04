@@ -1,9 +1,9 @@
 import express from "express";
 import path from "path";
-import { CronJob } from "cron";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { randomChar } from "./randomChar.js";
+import cron from "node-cron";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,14 +19,16 @@ app.route("/").get((req, res) => {
 
 var char;
 
-const job = CronJob.from({
-  cronTime: "*/10 * * * * *",
-  onTick: function () {
-    console.log("ok");
+cron.schedule(
+  "0 4 * * *",
+  () => {
     char = randomChar();
+    console.log(char);
   },
-  start: true,
-  timeZone: "America/Sao_Paulo",
-});
+  {
+    scheduled: true,
+    timezone: "America/Sao_Paulo",
+  }
+);
 
 app.route("/daily").get((req, res) => res.json({ char: char }));
